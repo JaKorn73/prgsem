@@ -1,0 +1,8 @@
+Coding style - memory leaky
+Přidat README.md - popis souborů + klávesy
+10 bodů v GUI - používám myš a menu (musí být text, tlačítko)
+Paralelní výpočet jsou 2 výpočetní moduly - nejspíš
+Uložení obrázku do souboru je easy
+BURST - v pohodě, musí fungovat
+Vyzkoušej to na linuxu
+Pozor na abort - kreslení po abortu

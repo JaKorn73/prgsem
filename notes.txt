@@ -1,0 +1,60 @@
+how to communicate via named pipes?
+    b3b36prg-sem
+
+how to create threads?
+    b3b36prg-lec08-codes.zip
+
+how to handle keyboard
+    b3b36prg-lec08-codes.zip
+
+how to communicate from thread to another thread?
+    event_queue
+    main thread reads event_queue
+    other threads will push events to the queue
+
+how to visualise?
+    faigl-sem.zip / prg examp impl
+    sdl - xwin_sdl
+
+how to setup / config default parameters
+    by default use some simple values
+    VGA 640x480, take inspiration from the binaries
+
+how to control the application - keybinding?
+    defined in prgsem
+
+
+---
+architecture of the application
+-- main - create threads
+
+events:
+    pipe_in --read messatges from computational module
+    keyboard -- 
+    main_logic --
+
+resources:
+    keyboard (read) / stdin but can be also from window
+    pipe (in read)
+    pipe (out write)
+    event_queue
+    
+threads:
+    boss - main() - will create and join all other threads
+    keyboard (read keyboard) and send events to main()
+    |- read keyboard --translate keybindings to events (to make an action via main thread)
+    |- push events to queue
+    pipe_in (computational_module.out) send events to main()
+    |- read pipe
+    |- push events to queue
+
+    main (read events from other threads, pipe write - computational_module.in, graphics window)
+    |- pop events from queue
+    |- write pipe
+    |- refresh pipe
+
+---
+event_queue - module based *global* variable
+
+TODO:
+    create event_queue.c based on event_queue.h
