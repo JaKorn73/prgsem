@@ -70,6 +70,63 @@ static struct {
   .reseted = false
 };
 
+// Getters for GUI
+double get_range_re_min()
+{
+  return comp.range_re_min;
+}
+
+double get_range_re_max()
+{
+  return comp.range_re_max;
+}
+
+double get_range_im_min()
+{
+  return comp.range_im_min;
+}
+
+double get_range_im_max()
+{
+  return comp.range_im_max;
+}
+
+double get_c_re()
+{
+  return comp.c_re;
+}
+
+double get_c_im()
+{
+  return comp.c_im;
+}
+
+int get_n()
+{
+  return comp.n;
+}
+
+// Setters for GUI
+void set_range_re_min(int new_value)
+{
+  comp.range_re_min = new_value;
+}
+
+void set_range_re_max(int new_value)
+{
+  comp.range_re_min = new_value;
+}
+
+void set_range_im_min(int new_value)
+{
+  comp.range_im_min = new_value;
+}
+
+void set_range_im_max(int new_value)
+{
+  comp.range_im_max = new_value;
+}
+
 void computation_init(void)
 {
   comp.grid = my_alloc(comp.grid_w * comp.grid_h);
@@ -81,7 +138,6 @@ void computation_init(void)
   comp.d_im = -(comp.range_im_max - comp.range_im_min) / (1. * comp.grid_h);
 
   comp.nbr_chunks = (comp.grid_w * comp.grid_h) / (comp.chunk_n_re * comp.chunk_n_im);
-  fprintf(stderr, "Number of chunks: %d", comp.nbr_chunks);
 
 }
 

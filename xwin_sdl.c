@@ -7,16 +7,21 @@
 #include <assert.h>
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 #include <SDL_image.h>
 
 #include "menu.h"
 #include "utils.h"
+#include "gui.h"
+#include "menu_parameters.h"
+
 
 #include "xwin_sdl.h"
 
-#define MENU_HEIGHT 300
-#define MENU_WIDTH 600
+#define FONT_PATH "./fonts/Roboto-Black.ttf"
+#define FONT_SIZE 30
+#define MENU_TEXT "MENU"
 
 #define MENU_BUTTON_HEIGHT 50
 
@@ -61,14 +66,19 @@ static unsigned char icon_32x32_bits[] = {
 
 int xwin_init(int w, int h)
 {
+   SDL_SetHint("SDL_HINT_IME_SHOW_UI", "1");
+
    int r = SDL_Init(SDL_INIT_VIDEO);
    my_assert(win == NULL, __func__, __LINE__, __FILE__);
    win = SDL_CreateWindow("PRG Semester Project", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h + MENU_BUTTON_HEIGHT, SDL_WINDOW_SHOWN);
+
    my_assert(win != NULL, __func__, __LINE__, __FILE__);
    SDL_SetWindowTitle(win, "PRG SEM");
    SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(icon_32x32_bits, 32, 32, 24, 32*3, 0xff, 0xff00, 0xff0000, 0x0000);
    SDL_SetWindowIcon(win, surface);
    SDL_FreeSurface(surface);
+
+
    return r;
 }
 
@@ -102,6 +112,7 @@ void xwin_close()
    }
    SDL_DestroyWindow(win);
    win = NULL;
+   SDL_Quit();
 }
 
 void menu_close()
@@ -116,6 +127,7 @@ void menu_close()
 
 void xwin_redraw(int w, int h, unsigned char *img)
 {
+   debug("Redrawing...");
    my_assert(img && win, __func__, __LINE__, __FILE__);
    SDL_Surface *scr = SDL_GetWindowSurface(win);
    for(int y = 0; y < scr->h; ++y) {

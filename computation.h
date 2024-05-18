@@ -18,6 +18,23 @@ void computation_cleanup(void);
 void get_grid_size(int *w, int *h);
 void set_grid_size(int w, int h);
 
+// Getters for GUI
+double get_range_re_min();
+double get_range_re_max();
+double get_range_im_min();
+double get_range_im_max();
+double get_c_re();
+double get_c_im();
+int get_n();
+
+// Setters for GUI
+void set_range_re_min(int new_value);
+void set_range_re_max(int new_value);
+void set_range_im_min(int new_value);
+void set_range_im_max(int new_value);
+void set_c_re();
+void set_c_im();
+
 bool is_computing(void);
 bool is_done(void);
 bool is_abort(void);

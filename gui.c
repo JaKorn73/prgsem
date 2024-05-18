@@ -15,11 +15,12 @@
 #include "computation.h"
 #include "event_queue.h"
 #include "menu.h"
+#include "menu_parameters.h"
 
 #define ARROW_UP 1073741906
 #define ARROW_DOWN 1073741905
 #define SDL_EVENT_POLL_WAIT_MS 10
-#define MENU_HEIGHT 50
+
 
 int menu_id = 0;
 
@@ -101,7 +102,6 @@ void* gui_win_thread(void *d)
       handle_menu_event(sdl_ev, &menu_id);
     } else {
       if (sdl_ev.type == SDL_KEYDOWN) {
-        // fprintf(stderr, "Arrow type: %d", sdl_ev.key.keysym.sym);
         switch(sdl_ev.key.keysym.sym) {
           case SDLK_a:
             ev.type = EV_ABORT;
@@ -131,11 +131,11 @@ void* gui_win_thread(void *d)
             set_quit();
             ev.type = EV_QUIT;
             break;
-          
+
           case SDLK_r:
             ev.type = EV_REFRESH;
             break;
-          
+
           case SDLK_s:
             ev.type = EV_SET_COMPUTE;
             break;
@@ -148,17 +148,16 @@ void* gui_win_thread(void *d)
               ev.type = EV_REFRESH;
             }
             break;
-          
+
           case SDLK_1:
             info("Computation in the background started");
             ev.type = EV_COMPUTE_CPU;
             break;
-          
-          
+
           case ARROW_UP:
             increase_n();
             break;
-          
+
           case ARROW_DOWN:
             decrease_n();
             break;
@@ -166,9 +165,6 @@ void* gui_win_thread(void *d)
       } else if (sdl_ev.type == SDL_KEYUP) {
         info("keyup");
       } else if (sdl_ev.type == SDL_WINDOWEVENT) {
-        // info("window event");
-        // fprintf(stderr, "%d == ", sdl_ev.window.event);
-        // fprintf(stderr, "%d\n", SDL_WINDOWEVENT_EXPOSED);
         if (sdl_ev.window.event == SDL_WINDOWEVENT_CLOSE) {
           set_quit();
           ev.type = EV_QUIT;

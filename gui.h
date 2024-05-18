@@ -15,4 +15,5 @@ void gui_refresh(void);
 void generate_menu_button(void);
 
 void* gui_win_thread(void*);
+
 #endif
