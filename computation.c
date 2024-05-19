@@ -107,25 +107,41 @@ int get_n()
 }
 
 // Setters for GUI
-void set_range_re_min(int new_value)
+void set_range_re_min(double new_value)
 {
   comp.range_re_min = new_value;
 }
 
-void set_range_re_max(int new_value)
+void set_range_re_max(double new_value)
 {
-  comp.range_re_min = new_value;
+  comp.range_re_max = new_value;
 }
 
-void set_range_im_min(int new_value)
+void set_range_im_min(double new_value)
 {
   comp.range_im_min = new_value;
 }
 
-void set_range_im_max(int new_value)
+void set_range_im_max(double new_value)
 {
   comp.range_im_max = new_value;
 }
+
+void set_c_re(double new_value)
+{
+  comp.c_re = new_value;
+}
+
+void set_c_im(double new_value)
+{
+  comp.c_im = new_value;
+}
+
+void set_n(int new_value)
+{
+  comp.n = new_value;
+}
+
 
 void computation_init(void)
 {

@@ -28,12 +28,13 @@ double get_c_im();
 int get_n();
 
 // Setters for GUI
-void set_range_re_min(int new_value);
-void set_range_re_max(int new_value);
-void set_range_im_min(int new_value);
-void set_range_im_max(int new_value);
-void set_c_re();
-void set_c_im();
+void set_range_re_min(double new_value);
+void set_range_re_max(double new_value);
+void set_range_im_min(double new_value);
+void set_range_im_max(double new_value);
+void set_c_re(double new_value);
+void set_c_im(double new_value);
+void set_n(int new_value);
 
 bool is_computing(void);
 bool is_done(void);

@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "menu.h"
 #include "gui.h"
@@ -16,34 +17,56 @@
 #include "menu_parameters.h"
 #include "computation.h"
 
-int active_rect_id = -1;
+int active_rect_id = EMPTY_ID;
 
-void create_box_with_text(SDL_Renderer *renderer, TTF_Font *font, char *text, SDL_Color *text_color, int text_x_start, int text_y_start, bool outline)
+
+// Setup buttons in menu
+button_t c_re = { .id = C_RE_ID, .x_start = X_FIRST_COL, .x_end = X_FIRST_COL + BOX_WIDTH, .y_start = Y_FIRST_ROW, .y_end = Y_FIRST_ROW + BOX_HEIGHT };
+button_t c_im = { .id = C_IM_ID, .x_start = X_SEC_COL, .x_end = X_SEC_COL + BOX_WIDTH, .y_start = Y_FIRST_ROW, .y_end = Y_FIRST_ROW + BOX_HEIGHT };
+
+button_t re_min = { .id = RE_MIN_ID, .x_start = X_FIRST_COL, .x_end = X_FIRST_COL + BOX_WIDTH, .y_start = Y_SEC_ROW, .y_end = Y_SEC_ROW + BOX_HEIGHT };
+button_t re_max = { .id = RE_MAX_ID, .x_start = X_SEC_COL, .x_end = X_SEC_COL + BOX_WIDTH, .y_start = Y_SEC_ROW, .y_end = Y_SEC_ROW + BOX_HEIGHT };
+
+button_t im_min = { .id = IM_MIN_ID, .x_start = X_FIRST_COL, .x_end = X_FIRST_COL + BOX_WIDTH, .y_start = Y_THIRD_ROW, .y_end = Y_THIRD_ROW + BOX_HEIGHT };
+button_t im_max = { .id = IM_MAX_ID, .x_start = X_SEC_COL, .x_end = X_SEC_COL + BOX_WIDTH, .y_start = Y_THIRD_ROW, .y_end = Y_THIRD_ROW + BOX_HEIGHT };
+
+button_t n = { .id = N_ID, .x_start = X_FIRST_COL, .x_end = X_FIRST_COL + BOX_WIDTH, .y_start = Y_FOURTH_ROW, .y_end = Y_FOURTH_ROW + BOX_HEIGHT };
+button_t save = { .id = SAVE_ID, .x_start = X_SEC_COL, .x_end = X_SEC_COL + BOX_WIDTH, .y_start = Y_FOURTH_ROW, .y_end = Y_FOURTH_ROW + BOX_HEIGHT };
+
+button_t message_but = { .id = MESSAGE_ID, .x_start = X_FIRST_COL, .x_end = X_FIRST_COL + BOX_WIDTH, .y_start = Y_FIFTH_ROW + BOX_HEIGHT, .y_end = Y_FIFTH_ROW + 2*BOX_HEIGHT };
+
+
+void create_box_with_text(SDL_Renderer *renderer, button_t *button, char *text, TTF_Font *font, SDL_Color *text_color, bool input)
 {
   SDL_Surface *surface = TTF_RenderText_Blended(font, text, *text_color);
   SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-  SDL_Rect rect = { .x = text_x_start, .y = text_y_start, .w = surface->w, .h = surface->h};
-  
+
+  SDL_Rect rect = { .x = button->x_start, .y = button->y_start, .w = surface->w, .h = surface->h};
+
+  if (input)
+    rect.y += BOX_HEIGHT;
+
   SDL_FreeSurface(surface);
 
   SDL_SetRenderDrawColor(renderer, 0,0,0,255);
   SDL_RenderCopy(renderer, texture, NULL, &rect);
 
-  if (outline) {
+  if (input) {
+    SDL_Rect outline_rect = { .x = button->x_start, .y = button->y_start + BOX_HEIGHT, .w = button->x_end - button->x_start, .h = button->y_end - button->y_start};
     SDL_SetRenderDrawColor(renderer, 255,0,0,255);
-    SDL_RenderDrawRect(renderer, &rect);
+    SDL_RenderDrawRect(renderer, &outline_rect);
   }
 
   SDL_DestroyTexture(texture);
 }
 
-void create_menu_part(SDL_Renderer *renderer, TTF_Font *text_font, TTF_Font *input_font, char *text, char *input_text, SDL_Color *text_color, int text_x_start, int text_y_start)
+void create_menu_part(SDL_Renderer *renderer, button_t *button, TTF_Font *text_font, TTF_Font *input_font, char *text, SDL_Color *text_color)
 {
-  create_box_with_text(renderer, text_font, text, text_color, text_x_start, text_y_start, false);
-  create_box_with_text(renderer, input_font, input_text, text_color, text_x_start, text_y_start + TEXT_FONT_SIZE + PADDING, true);
+  create_box_with_text(renderer, button, text, text_font, text_color, false);
+  create_box_with_text(renderer, button, button->value, input_font, text_color, true);
 }
 
-void create_menu(SDL_Window *menu, SDL_Renderer *menu_renderer) {
+void create_menu(SDL_Renderer *menu_renderer, bool load_constants, char *error_mess) {
   TTF_Init();
   TTF_Font *text_font = TTF_OpenFont(FONT_PATH, TEXT_FONT_SIZE);
   TTF_Font *input_font = TTF_OpenFont(FONT_PATH, INPUT_FONT_SIZE);
@@ -53,42 +76,50 @@ void create_menu(SDL_Window *menu, SDL_Renderer *menu_renderer) {
     return;
   }
 
-  SDL_Color text_color = { 255, 255, 255, 255 };  
+  SDL_Color text_color = { 255, 255, 255, 255 };
+  SDL_Color error_color = { 255, 0, 0, 255 }; 
+  SDL_Color success_color = { 0, 255, 0, 255 };
 
-  char range_re_min_str[10];
-  char range_re_max_str[10];
-  char range_im_min_str[10];
-  char range_im_max_str[10];
+  if (load_constants) {
+    sprintf(c_re.value, "%.3f", get_c_re());
+    sprintf(c_im.value, "%.3f", get_c_im());
 
-  char c_re[10];
-  char c_im[10];
-  char n_str[10];
+    sprintf(re_min.value, "%.3f", get_range_re_min());
+    sprintf(re_max.value, "%.3f", get_range_re_max());
+    sprintf(im_min.value, "%.3f", get_range_im_min());
+    sprintf(im_max.value, "%.3f", get_range_im_max());
 
-  sprintf(range_re_min_str, "%.2f", get_range_re_min());
-  sprintf(range_re_max_str, "%.2f", get_range_re_max());
-  sprintf(range_im_min_str, "%.2f", get_range_im_min());
-  sprintf(range_im_max_str, "%.2f", get_range_im_max());
-
-  sprintf(c_re, "%.2f", get_c_re());
-  sprintf(c_im, "%.2f", get_c_im());
-
-  sprintf(n_str, "%d", get_n());
+    sprintf(n.value, "%d", get_n());
+  }
 
   SDL_SetRenderDrawColor(menu_renderer, 0,0,0,255);
 
   SDL_RenderClear(menu_renderer);
-  create_menu_part(menu_renderer, text_font, input_font, TEXT_C_RE, c_re, &text_color, X_FIRST_COL, Y_FIRST_ROW);
-  create_menu_part(menu_renderer, text_font, input_font, TEXT_C_IM, c_im, &text_color, X_SEC_COL, Y_FIRST_ROW);
+  create_menu_part(menu_renderer, &c_re, text_font, input_font, TEXT_C_RE, &text_color);
+  create_menu_part(menu_renderer, &c_im, text_font, input_font, TEXT_C_IM, &text_color);
 
-  create_menu_part(menu_renderer, text_font, input_font, TEXT_RE_MIN, range_re_min_str, &text_color, X_FIRST_COL, Y_SEC_ROW);
-  create_menu_part(menu_renderer, text_font, input_font, TEXT_RE_MAX, range_re_max_str, &text_color, X_SEC_COL, Y_SEC_ROW);
+  create_menu_part(menu_renderer, &re_min, text_font, input_font, TEXT_RE_MIN, &text_color);
+  create_menu_part(menu_renderer, &re_max, text_font, input_font, TEXT_RE_MAX, &text_color);
 
-  create_menu_part(menu_renderer, text_font, input_font, TEXT_IM_MIN, range_im_min_str, &text_color, X_FIRST_COL, Y_THIRD_ROW);
-  create_menu_part(menu_renderer, text_font, input_font, TEXT_IM_MAX, range_im_max_str, &text_color, X_SEC_COL, Y_THIRD_ROW);
+  create_menu_part(menu_renderer, &im_min, text_font, input_font, TEXT_IM_MIN, &text_color);
+  create_menu_part(menu_renderer, &im_max, text_font, input_font, TEXT_IM_MAX, &text_color);
 
-  create_menu_part(menu_renderer, text_font, input_font, TEXT_N, n_str, &text_color, X_FIRST_COL, Y_FOURTH_ROW);
+  create_menu_part(menu_renderer, &n, text_font, input_font, TEXT_N, &text_color);
+
+  create_box_with_text(menu_renderer, &save, TEXT_SAVE, text_font, &text_color, true);
+
+  if (error_mess) {
+    if (!strcmp(error_mess, WRONG_INPUT_MESS)) {
+      create_box_with_text(menu_renderer, &message_but, error_mess, text_font, &error_color, false);
+    } else if (!strcmp(error_mess, SUCCESS_INPUT) || !strcmp(error_mess, SUCCESS_SAVE)) {
+      create_box_with_text(menu_renderer, &message_but, error_mess, text_font, &success_color, false);
+    }
+  }
 
   SDL_RenderPresent(menu_renderer);
+
+  TTF_CloseFont(text_font);
+  TTF_CloseFont(input_font);
   TTF_Quit();
 }
 
@@ -100,7 +131,7 @@ void handle_menu_event(SDL_Event event, int *menu_id) {
         if (*menu_id != 0) {
           menu_close();
           *menu_id = 0;
-          active_rect_id = -1;
+          active_rect_id = EMPTY_ID;
         }
         break;
     }
@@ -109,66 +140,134 @@ void handle_menu_event(SDL_Event event, int *menu_id) {
       if (*menu_id != 0) {
         menu_close();
         *menu_id = 0;
-        active_rect_id = -1;
+        active_rect_id = EMPTY_ID;
       }
     }
   } else if (event.type == SDL_MOUSEBUTTONUP) {
-    if (event.button.x > X_FIRST_COL && event.button.x < X_FIRST_COL + BOX_WIDTH && event.button.y > Y_FIRST_ROW + TEXT_FONT_SIZE + PADDING && event.button.y < Y_FIRST_ROW + TEXT_FONT_SIZE + PADDING + BOX_HEIGHT) {
-      debug("First rectangle is active");
-      active_rect_id = 0;
-    } else if (true) {
+    if (is_button(&save, event.button.x, event.button.y)) {
+      save_new_constants();
+      active_rect_id = EMPTY_ID;
+      info("Variables saved");
+      create_menu(get_menu_renderer(), false, SUCCESS_SAVE);
 
+
+    } else {
+      set_active_id(event.button.x, event.button.y);
+      handle_text_input();
     }
-
-    debug("Mousebuttonup");
-    // handle_text_input();
-  } else if (event.type == SDL_TEXTINPUT) {
-    debug("Text input!!!");
-    handle_text_input(event);
-    
   }
 }
 
-void handle_text_input(SDL_Event event)
+void handle_text_input()
 {
-  if (active_rect_id == -1)
+  if (active_rect_id == EMPTY_ID)
     return;
-  // SDL_bool done = SDL_FALSE;
-  // char text[10];
-  // sprintf(text, "%.2f", get_range_re_min());
-  // int text_length = 4;
 
-  // while(!done) {
-  //   SDL_Event event;
-  //   if (SDL_PollEvent(&event)) {
-  //     switch(event.type) {
-  //       case SDL_QUIT:
-  //         done = SDL_TRUE;
-  //         break;
-  //       case SDL_TEXTINPUT:
-  //         fprintf(stderr, "text: %s\n", event.text.text);
-  //         fprintf(stderr, "text: %d\n", event.text.type);
+  bool done = false;
+  SDL_Event ev;
+  int i = 0;
 
-  //         strcat(text, event.text.text);
+  bool dot = false;
+  unsigned short int is_minus = 0;
+  char *error_mess = NULL;
 
-  //         break;
-  //       case SDL_TEXTEDITING:
-  //         fprintf(stderr, "AAAAA\n");
-  //         break;
+  button_t *button = get_button_from_id();
+  fprintf(stderr, "This is the button clicked: %d\n", button->id);
 
-  //       case SDL_KEYDOWN:
-  //         fprintf(stderr, "keydown: %d\n", event.key.keysym.sym);
-  //         // if (event.key.keysym.sym == 8) {
+  for (int j = 0; j <= INPUT_LEN; j++)
+    button->value[j] = ' ';
 
-  //         // }
-  //         break;
+  create_menu(get_menu_renderer(), false, NULL);
 
-  //       default:
-  //         break;
-  //     }
-  //   }
-  // }
-  // SDL_StopTextInput();
-  // fprintf(stderr, "This is the text: %s\n", text);
-  // free(text);
+  while(!done) {
+    if (SDL_PollEvent(&ev)) {
+      if (ev.type == SDL_TEXTINPUT) {
+        fprintf(stderr, "Text: %d\n", ev.text.text[0]);
+        if (ASCII_ZERO <= ev.text.text[0] && ev.text.text[0] <= ASCII_NINE) {
+          button->value[i++] = ev.text.text[0];
+          error_mess = NULL;
+
+        } else if (ev.text.text[0] == ASCII_DOT && dot == false) {
+          button->value[i++] = ev.text.text[0];
+          dot = true;
+          error_mess = NULL;
+
+        } else if (ev.text.text[0] == ASCII_MINUS && i == 0) {
+          button->value[i++] = ev.text.text[0];
+          is_minus = 1;
+          error_mess = NULL;
+
+        } else {
+          error_mess = WRONG_INPUT_MESS;
+        }
+        create_menu(get_menu_renderer(), false, error_mess);
+      }
+    }
+    if (i >= INPUT_LEN + is_minus) {
+      done = true;
+      debug("done");
+      create_menu(get_menu_renderer(), false, SUCCESS_INPUT);
+    }
+  }
+}
+
+bool is_button(button_t *button, int x, int y)
+{
+  if (button->x_start < x && x < button->x_end
+    && button->y_start + BOX_HEIGHT < y && y < button->y_end + BOX_HEIGHT)
+    return true;
+  else
+    return false;
+}
+
+void set_active_id(int x, int y)
+{
+  if (is_button(&c_re, x, y))
+    active_rect_id = c_re.id;
+  else if (is_button(&c_im, x, y))
+    active_rect_id = c_im.id;
+  else if (is_button(&re_min, x, y))
+    active_rect_id = re_min.id;
+  else if (is_button(&re_max, x, y))
+    active_rect_id = re_max.id;
+  else if (is_button(&im_min, x, y))
+    active_rect_id = im_min.id;
+  else if (is_button(&im_max, x, y))
+    active_rect_id = im_max.id;
+  else if (is_button(&n, x, y))
+    active_rect_id = n.id;
+  else 
+    active_rect_id = EMPTY_ID;
+}
+
+button_t *get_button_from_id()
+{
+  if (c_re.id == active_rect_id)
+    return &c_re;
+  else if (c_im.id == active_rect_id)
+    return &c_im;
+  else if (re_min.id == active_rect_id)
+    return &re_min;
+  else if (re_max.id == active_rect_id)
+    return &re_max;
+  else if (im_min.id == active_rect_id)
+    return &im_min;
+  else if (im_max.id == active_rect_id)
+    return &im_max;
+  else
+    return &n;
+}
+
+void save_new_constants()
+{
+  set_range_re_min(atof(re_min.value));
+  set_range_re_max(atof(re_max.value));
+  set_range_im_min(atof(im_min.value));
+  set_range_im_max(atof(im_max.value));
+
+  set_c_re(atof(c_re.value));
+  set_c_im(atof(c_im.value));
+
+  set_n(atoi(n.value));
+  computation_init();
 }

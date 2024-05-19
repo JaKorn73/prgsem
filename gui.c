@@ -183,8 +183,6 @@ void* gui_win_thread(void *d)
       } else if (sdl_ev.type == SDL_MOUSEBUTTONDOWN) {
         fprintf(stderr, "X coord: %d\nY coord: %d\n", sdl_ev.button.x, sdl_ev.button.y);
         if (sdl_ev.button.y > gui.h) {
-          debug("click");
-          increase_n();
           if (menu_id == 0) {
             menu_id = menu_init();
           } else {

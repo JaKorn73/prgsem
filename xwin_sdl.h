@@ -16,6 +16,9 @@ void menu_close();
 void xwin_redraw(int w, int h, unsigned char *img);
 void xwin_poll_events(void);
 
+void *get_menu_renderer();
+void *get_menu_win();
+
 #endif
 
 /* end of xwin_sdl.h */

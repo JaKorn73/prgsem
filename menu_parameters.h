@@ -1,23 +1,23 @@
 
 #define FONT_PATH "./fonts/Roboto-Black.ttf"
 #define TEXT_FONT_SIZE 30
-#define INPUT_FONT_SIZE 50
-#define MENU_HEIGHT 600
+#define INPUT_FONT_SIZE 40
+#define MENU_HEIGHT 800
 #define MENU_WIDTH 1000
 
-#define PADDING 10
 #define BOX_WIDTH 300
 #define BOX_HEIGHT 50
 
 #define Y_FIRST_ROW 10
-#define Y_SEC_ROW 120
+#define Y_SEC_ROW 130
 #define Y_THIRD_ROW 250
-#define Y_FOURTH_ROW 380
+#define Y_FOURTH_ROW 370
+#define Y_FIFTH_ROW 490
 
 #define X_FIRST_COL 10
 #define X_SEC_COL 320
 
-// Complex constant c
+// Text before inputs
 #define TEXT_C_RE "Re. cast konstanty:"
 #define TEXT_C_IM "Im. cast konstanty:"
 
@@ -29,3 +29,28 @@
 
 #define TEXT_N "Iterations n:"
 
+#define TEXT_SAVE "Save"
+
+#define WRONG_INPUT_MESS "Wrong input!"
+#define SUCCESS_INPUT "Input entered successfuly"
+#define SUCCESS_SAVE "Variables saved"
+
+#define INPUT_LEN 5
+
+#define ASCII_MINUS 45
+#define ASCII_DOT 46
+#define ASCII_ZERO 48
+#define ASCII_NINE 57
+
+enum {
+    EMPTY_ID,
+    C_RE_ID,
+    C_IM_ID,
+    RE_MIN_ID,
+    RE_MAX_ID,
+    IM_MIN_ID,
+    IM_MAX_ID,
+    N_ID,
+    SAVE_ID,
+    MESSAGE_ID
+};

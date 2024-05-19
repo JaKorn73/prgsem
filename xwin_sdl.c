@@ -99,7 +99,7 @@ int menu_init()
    SDL_SetWindowIcon(menu, surface);
    SDL_FreeSurface(surface);
 
-   create_menu(menu, menu_renderer);
+   create_menu(menu_renderer, true, NULL);
 
    return SDL_GetWindowID(menu);
 }
@@ -146,6 +146,17 @@ void xwin_poll_events(void)
 {
    SDL_Event event;
    while (SDL_PollEvent(&event));
+}
+
+// easy getters
+void *get_menu_win()
+{
+   return menu;
+}
+
+void *get_menu_renderer()
+{
+   return menu_renderer;
 }
 
 /* end of xwin_sdl.c */
