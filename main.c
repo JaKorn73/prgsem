@@ -105,7 +105,7 @@ void* main_thread(void* d)
   return NULL;
 }
 
-void process_pipe_message(event* const ev)
+void process_pipe_message(event *const ev)
 {
   my_assert(ev != NULL && ev->type == EV_PIPE_IN_MESSAGE && ev->data.msg, __func__, __LINE__, __FILE__);
   ev->type = EV_TYPE_NUM;

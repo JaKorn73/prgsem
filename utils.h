@@ -22,3 +22,5 @@ void error(const char *str);
 void warn(const char *str);
 
 #endif
+
+/* end of utils.h */
