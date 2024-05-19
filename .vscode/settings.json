@@ -2,6 +2,17 @@
     "files.associations": {
         "xwin_sdl.h": "c",
         "sdl_image.h": "c",
-        "menu_parameters.h": "c"
+        "menu_parameters.h": "c",
+        "computation_main.h": "c",
+        "prg_io_nonblock.h": "c",
+        "stdio.h": "c",
+        "pthread.h": "c",
+        "utils.h": "c",
+        "messages.h": "c",
+        "stdlib.h": "c",
+        "computation.h": "c",
+        "complex.h": "c",
+        "sdl_ttf.h": "c",
+        "string.h": "c"
     }
 }

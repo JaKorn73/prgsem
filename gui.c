@@ -17,10 +17,6 @@
 #include "menu.h"
 #include "menu_parameters.h"
 
-#define ARROW_UP 1073741906
-#define ARROW_DOWN 1073741905
-#define SDL_EVENT_POLL_WAIT_MS 10
-
 
 int menu_id = 0;
 
@@ -38,15 +34,6 @@ void gui_init(void)
   generate_menu_button();
   my_assert(xwin_init(gui.w, gui.h) == 0, __func__, __LINE__, __FILE__);
   xwin_redraw(gui.w, gui.h, gui.img);
-}
-
-void gui_resize(int w, int h)
-{
-  gui.w = w;
-  gui.h = h;
-  gui_cleanup();
-  gui_init();
-
 }
 
 void gui_cleanup(void)
@@ -67,6 +54,15 @@ void gui_refresh(void)
   }
 }
 
+void gui_resize(int w, int h)
+{
+  gui.w = w;
+  gui.h = h;
+  gui_cleanup();
+  gui_init();
+
+}
+
 int round_pixels(int pixel)
 {
   int len = log10(pixel);
@@ -76,7 +72,6 @@ int round_pixels(int pixel)
 
 void generate_menu_button(void)
 {
-  
   for (int i = (gui.w * gui.h * 3); i < ((gui.w * MENU_HEIGHT) + (gui.w * gui.h)) * 3; i += 3) {
     gui.img[i] = 255;
     gui.img[i + 1] = 0;
@@ -86,13 +81,11 @@ void generate_menu_button(void)
 
 void* gui_win_thread(void *d)
 {
-  debug("gui_win_thread - start");
   bool quit = false;
   SDL_Event sdl_ev;
   event ev;
   int resize_w = 640;
   int resize_h = 480;
-
 
   while(!quit) {
   ev.type = EV_TYPE_NUM;
@@ -189,8 +182,6 @@ void* gui_win_thread(void *d)
             warn("Menu is already opened!");
           }
         }
-      } else if (sdl_ev.type == SDL_MOUSEBUTTONUP) {
-        debug("Mouse button up");
       }
     }
     if (ev.type != EV_TYPE_NUM) {
@@ -201,7 +192,5 @@ void* gui_win_thread(void *d)
 
   quit = is_quit();
   }
-
-  debug("gui_win_thread - end");
   return NULL;
 }

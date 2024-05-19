@@ -1,7 +1,11 @@
 /*
  * filename: keyboard.c
- * author: Jan Faigl
+ * date: 2024/04/29 22:01
+ * author: Jakub Kornel
+ * email: kornejak@fel.cvut.cz
+ * inspired by: Jan Faigl
 */
+
 #include <stdio.h>
 #include <stdlib.h>
 

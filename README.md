@@ -22,7 +22,6 @@ For running the program, you have to first run `./create_pipes` and after that i
 
 - basic fractal computation
 - complete GUI (menu)
-- 
 
 
 ## Usage/Examples
@@ -32,11 +31,11 @@ This app supports couple commands. You cannot enter them directly into bash sinc
 Here is a list of commands:
  - `g` - prints out modul version (MSG_GET_VERSION)
  - `s` - sets parameters for computation (MSG_SET_COMPUTE)
- - `1` - spustí výpočet (MSG_COMPUTE)
+ - `1` - start computation in background (MSG_COMPUTE)
  - `a` - aborts running computation (MSG_ABORT)
  - `r` - resets chunk id to 0
- - `l` - smaže aktuální obsah výpočtu (bufferu)
- - `p` - překreslí obsah okna aktuálním stavem výpočtu (bufferem)
+ - `l` - deletes current buffer
+ - `p` - redraw current image with buffer
  - `c` - computes fractal and prints it out
  - `q` - ends the program
  - `KEY_UP` - increase the number `n` of iterations (this makes computation more precise)

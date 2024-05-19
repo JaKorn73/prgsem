@@ -17,19 +17,19 @@
 
 computation_set_t computation_set;
 
-void set_abort()
+bool is_aborted(void)
+{
+  return computation_set.is_aborted;
+}
+
+void set_abort(void)
 {
   computation_set.is_aborted = true;
 }
 
-void allow_comp()
+void allow_comp(void)
 {
   computation_set.is_aborted = false;
-}
-
-bool is_aborted()
-{
-  return computation_set.is_aborted;
 }
 
 void set_fractal_comp(const message *msg)
@@ -55,18 +55,18 @@ void compute_fractal(const message *msg, int pipe_out)
 
   for (int r = 0; r < msg->data.compute.n_re; r++) {
     for (int i = 0; i < msg->data.compute.n_im; i++) {
-        num = (msg->data.compute.re + computation_set.d_re * r) + ((msg->data.compute.im + computation_set.d_im * i) * I);
-        iters = count_convergence(num, computation_set.c, computation_set.n);
+      num = (msg->data.compute.re + computation_set.d_re * r) + ((msg->data.compute.im + computation_set.d_im * i) * I);
+      iters = count_convergence(num, computation_set.c, computation_set.n);
 
-        computed->data.compute_data.i_re = r;
-        computed->data.compute_data.i_im = i;
-        computed->data.compute_data.iter = iters;
+      computed->data.compute_data.i_re = r;
+      computed->data.compute_data.i_im = i;
+      computed->data.compute_data.iter = iters;
 
-        my_assert(fill_message_buf(computed, computed_buf, sizeof(message), &computed_len), __func__, __LINE__, __FILE__);
-        write(pipe_out, computed_buf, computed_len);
-        computed = my_alloc(sizeof(message));
-        computed->type = MSG_COMPUTE_DATA;
-        computed->data.compute_data.cid = msg->data.compute.cid;
+      my_assert(fill_message_buf(computed, computed_buf, sizeof(message), &computed_len), __func__, __LINE__, __FILE__);
+      write(pipe_out, computed_buf, computed_len);
+      computed = my_alloc(sizeof(message));
+      computed->type = MSG_COMPUTE_DATA;
+      computed->data.compute_data.cid = msg->data.compute.cid;
     }
   }
   free(computed);
@@ -75,7 +75,6 @@ void compute_fractal(const message *msg, int pipe_out)
 
 int count_convergence(double complex num, double complex comp_const, int max_steps)
 {
-
   for (int i = 1; i < max_steps; i++) {
     num *= num;
     num += comp_const;
@@ -83,5 +82,4 @@ int count_convergence(double complex num, double complex comp_const, int max_ste
       return i;
   }
   return 0;
-
 }

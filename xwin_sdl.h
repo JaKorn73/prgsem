@@ -2,6 +2,7 @@
  * Filename: xwin_sdl.h
  * Date:     2015/06/18 14:37
  * Author:   Jan Faigl
+ * Modified by: Jakub Kornel
  */
 
 #ifndef __XWIN_SDL_H__

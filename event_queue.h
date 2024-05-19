@@ -1,8 +1,10 @@
 /*
- * Filename: event_queue.h
- * Date:     2017/04/15 12:41
- * Author:   Jan Faigl
- */
+ * filename: event_queue.c
+ * date: 2024/04/27 15:07 
+ * author: Jakub Kornel
+ * email: kornejak@fel.cvut.cz
+ * inspired by: Jan Faigl
+*/
 
 #ifndef __EVENT_QUEUE_H__
 #define __EVENT_QUEUE_H__
@@ -48,9 +50,9 @@ event queue_pop(void);
 
 void queue_push(event ev);
 
-bool is_quit();
+bool is_quit(void);
 
-void set_quit();
+void set_quit(void);
 
 #endif
 

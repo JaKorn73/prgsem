@@ -2,6 +2,7 @@
  * Filename: messages.c
  * Date:     2017/04/15 11:22
  * Author:   Jan Faigl
+ * Modified by: Jakub Kornel
  */
 
 #include <string.h>

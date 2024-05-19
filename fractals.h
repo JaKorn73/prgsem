@@ -4,6 +4,8 @@
  * author: Jakub Kornel
  * email: kornejak@fel.cvut.cz
 */
+#ifndef __FRACTALS__
+#define __FRACTALS__
 
 #include <stdbool.h>
 #include <complex.h>
@@ -18,9 +20,17 @@ typedef struct {
    bool is_aborted;
 } computation_set_t;
 
+// Easy helper functions
+bool is_aborted(void);
+void set_abort(void);
+void allow_comp(void);
+
+// Computation functions
 void set_fractal_comp(const message *msg);
 void compute_fractal(const message *msg, int pipe_out);
 int count_convergence(double complex num, double complex comp_const, int max_steps);
-bool is_aborted();
-void set_abort();
-void allow_comp();
+
+
+#endif
+
+/* end of fractals.h */

@@ -1,6 +1,9 @@
 /*
  * filename: prgsem.c
- * author: Jan Faigl
+ * date: 2024/04/29 9:15
+ * author: Jakub Kornel
+ * email: kornejak@fel.cvut.cz
+ * inspired by: Jan Faigl
 */
 
 #include <stdlib.h>

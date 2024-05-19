@@ -3,6 +3,7 @@
  * date: 2024/04/27 15:07 
  * author: Jakub Kornel
  * email: kornejak@fel.cvut.cz
+ * inspired by: Jan Faigl
 */
 
 #include <stdbool.h>
@@ -40,9 +41,8 @@ void queue_cleanup(void)
 {
   while (q.in != q.out) {
     event ev = queue_pop();
-    if (ev.data.msg) {
+    if (ev.data.msg)
       free(ev.data.msg);
-    }
   }
 }
 
@@ -51,9 +51,8 @@ event queue_pop(void)
   event ev = { .type = EV_TYPE_NUM };
   pthread_mutex_lock(&(q.mtx));
 
-  while (!q.quit && q.in == q.out) {
+  while (!q.quit && q.in == q.out)
     pthread_cond_wait(&(q.cond), &(q.mtx));
-  }
 
   if (q.in != q.out) {
     ev = q.queue[q.out];
@@ -67,16 +66,16 @@ event queue_pop(void)
 void queue_push(event ev)
 {
   pthread_mutex_lock(&(q.mtx));
-  while( (q.in + 1) % QUEUE_CAPACITY == q.out) {
+  while( (q.in + 1) % QUEUE_CAPACITY == q.out)
     pthread_cond_wait(&(q.cond), &(q.mtx));
-  }
+  
   q.queue[q.in] = ev;
   q.in = (q.in + 1) % QUEUE_CAPACITY;
   pthread_cond_broadcast(&(q.cond));
   pthread_mutex_unlock(&(q.mtx));
 }
 
-bool is_quit()
+bool is_quit(void)
 {
   bool quit;
   pthread_mutex_lock(&(q.mtx));
@@ -85,7 +84,7 @@ bool is_quit()
   return quit;
 }
 
-void set_quit()
+void set_quit(void)
 {
   pthread_mutex_lock(&(q.mtx));
   q.quit = true;

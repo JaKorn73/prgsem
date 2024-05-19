@@ -18,7 +18,7 @@
 #include "computation.h"
 
 int active_rect_id = EMPTY_ID;
-
+bool quit_after = false;
 
 // Setup buttons in menu
 button_t c_re = { .id = C_RE_ID, .x_start = X_FIRST_COL, .x_end = X_FIRST_COL + BOX_WIDTH, .y_start = Y_FIRST_ROW, .y_end = Y_FIRST_ROW + BOX_HEIGHT };
@@ -36,34 +36,38 @@ button_t save = { .id = SAVE_ID, .x_start = X_SEC_COL, .x_end = X_SEC_COL + BOX_
 button_t message_but = { .id = MESSAGE_ID, .x_start = X_FIRST_COL, .x_end = X_FIRST_COL + BOX_WIDTH, .y_start = Y_FIFTH_ROW + BOX_HEIGHT, .y_end = Y_FIFTH_ROW + 2*BOX_HEIGHT };
 
 
-void create_box_with_text(SDL_Renderer *renderer, button_t *button, char *text, TTF_Font *font, SDL_Color *text_color, bool input)
-{
-  SDL_Surface *surface = TTF_RenderText_Blended(font, text, *text_color);
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+void handle_menu_event(SDL_Event event, int *menu_id) {
+  if (event.type == SDL_KEYUP) {
+    switch(event.key.keysym.sym) {
+      case SDLK_q:
+        if (*menu_id != 0) {
+          menu_close();
+          *menu_id = 0;
+          active_rect_id = EMPTY_ID;
+        }
+        break;
+    }
+  } else if ((event.type == SDL_WINDOWEVENT &&event.window.event == SDL_WINDOWEVENT_CLOSE)
+              || quit_after) {
+    if (*menu_id != 0) {
+      menu_close();
+      *menu_id = 0;
+      active_rect_id = EMPTY_ID;
+      quit_after = false;
+    }
+  } else if (event.type == SDL_MOUSEBUTTONUP) {
+    if (is_button(&save, event.button.x, event.button.y)) {
+      save_new_constants();
+      active_rect_id = EMPTY_ID;
+      info("Variables saved");
+      create_menu(get_menu_renderer(), false, SUCCESS_SAVE);
 
-  SDL_Rect rect = { .x = button->x_start, .y = button->y_start, .w = surface->w, .h = surface->h};
 
-  if (input)
-    rect.y += BOX_HEIGHT;
-
-  SDL_FreeSurface(surface);
-
-  SDL_SetRenderDrawColor(renderer, 0,0,0,255);
-  SDL_RenderCopy(renderer, texture, NULL, &rect);
-
-  if (input) {
-    SDL_Rect outline_rect = { .x = button->x_start, .y = button->y_start + BOX_HEIGHT, .w = button->x_end - button->x_start, .h = button->y_end - button->y_start};
-    SDL_SetRenderDrawColor(renderer, 255,0,0,255);
-    SDL_RenderDrawRect(renderer, &outline_rect);
+    } else {
+      set_active_id(event.button.x, event.button.y);
+      handle_text_input();
+    }
   }
-
-  SDL_DestroyTexture(texture);
-}
-
-void create_menu_part(SDL_Renderer *renderer, button_t *button, TTF_Font *text_font, TTF_Font *input_font, char *text, SDL_Color *text_color)
-{
-  create_box_with_text(renderer, button, text, text_font, text_color, false);
-  create_box_with_text(renderer, button, button->value, input_font, text_color, true);
 }
 
 void create_menu(SDL_Renderer *menu_renderer, bool load_constants, char *error_mess) {
@@ -123,39 +127,34 @@ void create_menu(SDL_Renderer *menu_renderer, bool load_constants, char *error_m
   TTF_Quit();
 }
 
+void create_menu_part(SDL_Renderer *renderer, button_t *button, TTF_Font *text_font, TTF_Font *input_font, char *text, SDL_Color *text_color)
+{
+  create_box_with_text(renderer, button, text, text_font, text_color, false);
+  create_box_with_text(renderer, button, button->value, input_font, text_color, true);
+}
 
-void handle_menu_event(SDL_Event event, int *menu_id) {
-  if (event.type == SDL_KEYDOWN) {
-    switch(event.key.keysym.sym) {
-      case SDLK_q:
-        if (*menu_id != 0) {
-          menu_close();
-          *menu_id = 0;
-          active_rect_id = EMPTY_ID;
-        }
-        break;
-    }
-  } else if (event.type == SDL_WINDOWEVENT) {
-    if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
-      if (*menu_id != 0) {
-        menu_close();
-        *menu_id = 0;
-        active_rect_id = EMPTY_ID;
-      }
-    }
-  } else if (event.type == SDL_MOUSEBUTTONUP) {
-    if (is_button(&save, event.button.x, event.button.y)) {
-      save_new_constants();
-      active_rect_id = EMPTY_ID;
-      info("Variables saved");
-      create_menu(get_menu_renderer(), false, SUCCESS_SAVE);
+void create_box_with_text(SDL_Renderer *renderer, button_t *button, char *text, TTF_Font *font, SDL_Color *text_color, bool input)
+{
+  SDL_Surface *surface = TTF_RenderText_Blended(font, text, *text_color);
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
+  SDL_Rect rect = { .x = button->x_start, .y = button->y_start, .w = surface->w, .h = surface->h};
 
-    } else {
-      set_active_id(event.button.x, event.button.y);
-      handle_text_input();
-    }
+  if (input)
+    rect.y += BOX_HEIGHT;
+
+  SDL_FreeSurface(surface);
+
+  SDL_SetRenderDrawColor(renderer, 0,0,0,255);
+  SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+  if (input) {
+    SDL_Rect outline_rect = { .x = button->x_start, .y = button->y_start + BOX_HEIGHT, .w = button->x_end - button->x_start, .h = button->y_end - button->y_start};
+    SDL_SetRenderDrawColor(renderer, 255,0,0,255);
+    SDL_RenderDrawRect(renderer, &outline_rect);
   }
+
+  SDL_DestroyTexture(texture);
 }
 
 void handle_text_input()
@@ -182,7 +181,6 @@ void handle_text_input()
   while(!done) {
     if (SDL_PollEvent(&ev)) {
       if (ev.type == SDL_TEXTINPUT) {
-        fprintf(stderr, "Text: %d\n", ev.text.text[0]);
         if (ASCII_ZERO <= ev.text.text[0] && ev.text.text[0] <= ASCII_NINE) {
           button->value[i++] = ev.text.text[0];
           error_mess = NULL;
@@ -201,6 +199,11 @@ void handle_text_input()
           error_mess = WRONG_INPUT_MESS;
         }
         create_menu(get_menu_renderer(), false, error_mess);
+      } else if (ev.type == SDL_MOUSEBUTTONDOWN)
+        break;
+      else if (ev.type == SDL_WINDOWEVENT && ev.window.event == SDL_WINDOWEVENT_CLOSE) {
+        quit_after = true;
+        break;
       }
     }
     if (i >= INPUT_LEN + is_minus) {

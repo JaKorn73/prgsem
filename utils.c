@@ -3,6 +3,7 @@
  * date: 2024/04/27 14:39 
  * author: Jakub Kornel
  * email: kornejak@fel.cvut.cz
+ * inspired by: Jan Faigl
 */
 
 #define _DEFAULT_SOURCE

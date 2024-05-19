@@ -1,4 +1,14 @@
+/*
+ * filename: menu.c
+ * date: 2024/05/15 16:03 
+ * author: Jakub Kornel
+ * email: kornejak@fel.cvut.cz
+*/
 
+#ifndef __MENU_PARAMETERS__
+#define __MENU_PARAMETERS__
+
+// Global menu variables
 #define FONT_PATH "./fonts/Roboto-Black.ttf"
 #define TEXT_FONT_SIZE 30
 #define INPUT_FONT_SIZE 40
@@ -17,6 +27,8 @@
 #define X_FIRST_COL 10
 #define X_SEC_COL 320
 
+#define INPUT_LEN 5
+
 // Text before inputs
 #define TEXT_C_RE "Re. cast konstanty:"
 #define TEXT_C_IM "Im. cast konstanty:"
@@ -28,20 +40,20 @@
 #define TEXT_IM_MAX "Max im. cast:"
 
 #define TEXT_N "Iterations n:"
-
 #define TEXT_SAVE "Save"
 
+// Messages for user
 #define WRONG_INPUT_MESS "Wrong input!"
 #define SUCCESS_INPUT "Input entered successfuly"
 #define SUCCESS_SAVE "Variables saved"
 
-#define INPUT_LEN 5
-
+// ASCII 
 #define ASCII_MINUS 45
 #define ASCII_DOT 46
 #define ASCII_ZERO 48
 #define ASCII_NINE 57
 
+// Button IDs
 enum {
     EMPTY_ID,
     C_RE_ID,
@@ -54,3 +66,6 @@ enum {
     SAVE_ID,
     MESSAGE_ID
 };
+#endif
+
+/* end of menu_parameters.h */

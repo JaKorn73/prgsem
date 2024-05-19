@@ -2,6 +2,7 @@
  * Filename: messages.h
  * Date:     2017/04/15 11:21
  * Author:   Jan Faigl
+ * Modified by Jakub Kornel
  */
 
 #ifndef __MESSAGES_H__
